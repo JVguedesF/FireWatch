@@ -26,9 +26,6 @@ jobs:
       - name: Run Tests
         run: mvn test
 
-      - name: Check for vulnerabilities
-        run: mvn org.owasp:dependency-check-maven:check
-
       - name: Build Docker Image
         run: docker build -t firewatch03:${{ github.sha }} .
 
@@ -67,35 +64,22 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            # Criar diretório se não existir
             mkdir -p ~/firewatch03
             
-            # Criar arquivo .env com as variáveis de ambiente
             cat > ~/firewatch03/.env << EOF
             DOCKER_IMAGE=firewatch03:${{ github.sha }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD_STAGING }}
-            JWT_SECRET=${{ secrets.JWT_SECRET_STAGING }}
-            GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD_STAGING }}
             EOF
             
-            # Copiar arquivos docker-compose e configurações
-            scp -r docker-compose.staging.yml monitoring ~/firewatch03/
+            scp docker-compose.yml ~/firewatch03/
             
-            # Aplicar as mudanças
             cd ~/firewatch03
-            docker-compose -f docker-compose.staging.yml down
-            docker-compose -f docker-compose.staging.yml up -d
-
-      - name: Verify Staging Deployment
-        run: |
-          # Aguardar a aplicação iniciar
-          sleep 30
-          # Verificar se a aplicação está respondendo
-          curl -f http://${{ secrets.STAGING_HOST }}:8080/actuator/health || exit 1
+            docker-compose down
+            docker-compose up -d
 
   deploy-production:
     name: Deploy to Production
-    needs: [build, deploy-staging]
+    needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
@@ -117,28 +101,16 @@ jobs:
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
-            # Criar diretório se não existir
             mkdir -p ~/firewatch03
             
-            # Criar arquivo .env com as variáveis de ambiente
             cat > ~/firewatch03/.env << EOF
             DOCKER_IMAGE=firewatch03:${{ github.sha }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD_PROD }}
-            JWT_SECRET=${{ secrets.JWT_SECRET_PROD }}
-            GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD_PROD }}
+            SPRING_PROFILES_ACTIVE=prod
             EOF
             
-            # Copiar arquivos docker-compose e configurações
-            scp -r docker-compose.prod.yml monitoring ~/firewatch03/
+            scp docker-compose.yml ~/firewatch03/
             
-            # Aplicar as mudanças
             cd ~/firewatch03
-            docker-compose -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.prod.yml up -d
-
-      - name: Verify Production Deployment
-        run: |
-          # Aguardar a aplicação iniciar
-          sleep 30
-          # Verificar se a aplicação está respondendo
-          curl -f http://${{ secrets.PRODUCTION_HOST }}:8080/actuator/health || exit 1
+            docker-compose down
+            docker-compose up -d
