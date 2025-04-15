@@ -64,15 +64,22 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
+            # Cria pasta e .env completo
             mkdir -p ~/firewatch03
-            
             cat > ~/firewatch03/.env << EOF
             DOCKER_IMAGE=firewatch03:${{ github.sha }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD_STAGING }}
+            SPRING_PROFILES_ACTIVE=staging
+            SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521:ORCLCDB
+            SPRING_DATASOURCE_USERNAME=firewatch
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD_STAGING }}
+            API_SECURITY_TOKEN_SECRET=${{ secrets.JWT_SECRET }}
+            GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}
             EOF
-            
+
+            # Copia o compose único
             scp docker-compose.yml ~/firewatch03/
-            
+
+            # Executa o deploy
             cd ~/firewatch03
             docker-compose down
             docker-compose up -d
@@ -102,13 +109,16 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
             mkdir -p ~/firewatch03
-            
             cat > ~/firewatch03/.env << EOF
             DOCKER_IMAGE=firewatch03:${{ github.sha }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD_PROD }}
             SPRING_PROFILES_ACTIVE=prod
+            SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521:ORCLCDB
+            SPRING_DATASOURCE_USERNAME=firewatch
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD_PROD }}
+            API_SECURITY_TOKEN_SECRET=${{ secrets.JWT_SECRET }}
+            GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}
             EOF
-            
+
             scp docker-compose.yml ~/firewatch03/
             
             cd ~/firewatch03
