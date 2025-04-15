@@ -1,0 +1,89 @@
+.
+├── estrutura.txt
+├── exportToHTML
+│   ├── index.html
+│   └── README.md.html
+├── FireWatch03
+│   ├── docker-compose.prod.yml
+│   ├── docker-compose.staging.yml
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── FireWatch03
+│   │   └── monitoring
+│   │       ├── grafana
+│   │       │   └── dashboards
+│   │       └── prometheus
+│   │           └── prometheus.yml
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── src
+│   │   ├── main
+│   │   │   ├── java
+│   │   │   │   └── com
+│   │   │   │       └── example
+│   │   │   │           └── FireWatch03
+│   │   │   │               ├── config
+│   │   │   │               ├── controllers
+│   │   │   │               ├── domain
+│   │   │   │               ├── dto
+│   │   │   │               ├── FireWatch03Application.java
+│   │   │   │               └── GlobalExceptionHandler.java
+│   │   │   └── resources
+│   │   │       ├── application.properties
+│   │   │       ├── application-secret.properties
+│   │   │       └── db
+│   │   │           └── migration
+│   │   │               ├── V1__create-tables
+│   │   │               ├── V2__create-table-users-autenticator
+│   │   │               └── V3__Create-appUser
+│   │   └── test
+│   │       └── java
+│   │           └── com
+│   │               └── example
+│   │                   └── FireWatch03
+│   │                       ├── domain
+│   │                       └── FireWatch03ApplicationTests.java
+│   └── target
+│       ├── classes
+│       │   ├── application.properties
+│       │   ├── application-secret.properties
+│       │   ├── com
+│       │   │   └── example
+│       │   │       └── FireWatch03
+│       │   │           ├── config
+│       │   │           │   └── security
+│       │   │           ├── controllers
+│       │   │           │   ├── AuthenticationController.class
+│       │   │           │   └── ReportFireController.class
+│       │   │           ├── domain
+│       │   │           │   ├── models
+│       │   │           │   ├── repositories
+│       │   │           │   └── services
+│       │   │           ├── dto
+│       │   │           │   ├── AuthenticationDTO.class
+│       │   │           │   ├── ErrorDTO.class
+│       │   │           │   ├── LoginResponseDTO.class
+│       │   │           │   ├── RegisterDTO.class
+│       │   │           │   └── ReportFireDTO.class
+│       │   │           ├── FireWatch03Application.class
+│       │   │           └── GlobalExceptionHandler.class
+│       │   └── db
+│       │       └── migration
+│       │           ├── V1__create-tables
+│       │           ├── V2__create-table-users-autenticator
+│       │           └── V3__Create-appUser
+│       ├── generated-sources
+│       │   └── annotations
+│       ├── generated-test-sources
+│       │   └── test-annotations
+│       └── test-classes
+│           └── com
+│               └── example
+│                   └── FireWatch03
+│                       ├── domain
+│                       │   └── services
+│                       └── FireWatch03ApplicationTests.class
+└── README.md
+
+52 directories, 35 files

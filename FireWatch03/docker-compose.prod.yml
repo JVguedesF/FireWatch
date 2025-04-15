@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  app:
+    image: ${DOCKER_IMAGE:-firewatch03:latest}
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521:ORCLCDB
+      - SPRING_DATASOURCE_USERNAME=firewatch
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - API_SECURITY_TOKEN_SECRET=${JWT_SECRET}
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - firewatch-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  db:
+    image: gvenzl/oracle-xe:21-slim
+    environment:
+      - ORACLE_PASSWORD=${DB_PASSWORD}
+      - ORACLE_DATABASE=ORCLCDB
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    ports:
+      - "1521:1521"
+    networks:
+      - firewatch-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - firewatch-network
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - firewatch-network
+    restart: always
+
+networks:
+  firewatch-network:
+    driver: bridge
+
+volumes:
+  oracle-data:
+  grafana-data:

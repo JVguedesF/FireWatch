@@ -1,27 +1,40 @@
-# Usando a imagem oficial do Maven com OpenJDK 21
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 
-# Copiando o código-fonte e o arquivo pom.xml para o diretório /app
-COPY src /app/src
-COPY pom.xml /app
-
-# Definindo o diretório de trabalho
+# Set working directory
 WORKDIR /app
 
-# Executando o Maven para construir o projeto
-RUN mvn clean install
+# Copy pom.xml separately to leverage Docker cache
+COPY pom.xml .
+# Download dependencies (will be cached if pom.xml doesn't change)
+RUN mvn dependency:go-offline
 
-# Usando uma imagem leve do OpenJDK 21
-FROM openjdk:21-slim
+# Copy source code
+COPY src ./src
 
-# Copiando o JAR gerado da etapa de build para a imagem final
-COPY --from=build /app/target/FireWatch03-0.0.1-SNAPSHOT.jar /app/FireWatch03-0.0.1-SNAPSHOT.jar
+# Build the application
+RUN mvn clean package -DskipTests
 
-# Definindo o diretório de trabalho
-WORKDIR /app/
+# Runtime stage
+FROM eclipse-temurin:21-jre-alpine
 
-# Expondo a porta 8080
+# Create a non-root user
+RUN addgroup -S firewatch && adduser -S firewatch -G firewatch
+
+# Set working directory
+WORKDIR /app
+
+# Copy JAR from build stage
+COPY --from=build /app/target/FireWatch03-0.0.1-SNAPSHOT.jar app.jar
+
+# Switch to non-root user
+USER firewatch
+
+# Expose application port
 EXPOSE 8080
 
-# Comando para executar o aplicativo
-CMD ["java", "-jar", "/app/FireWatch03-0.0.1-SNAPSHOT.jar"]
+# Add health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
+
+# Start the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

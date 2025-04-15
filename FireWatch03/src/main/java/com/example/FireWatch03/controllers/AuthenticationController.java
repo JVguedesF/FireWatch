@@ -2,7 +2,7 @@ package com.example.FireWatch03.controllers;
 
 import com.example.FireWatch03.domain.repositories.UserAutenticatorRepository;
 import com.example.FireWatch03.dto.*;
-import com.example.FireWatch03.config.security.TokenService;
+import com.example.FireWatch03.domain.services.TokenService;
 import com.example.FireWatch03.domain.models.UserAutenticator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

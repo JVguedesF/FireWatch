@@ -1,6 +1,7 @@
 package com.example.FireWatch03.config.security;
 
 import com.example.FireWatch03.domain.repositories.UserAutenticatorRepository;
+import com.example.FireWatch03.domain.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
