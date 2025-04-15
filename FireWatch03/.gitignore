@@ -35,4 +35,4 @@ build/
 ### Aplication-secret.propeties ###
 **/application-secret.properties
 
-/target/
+/target/.env
